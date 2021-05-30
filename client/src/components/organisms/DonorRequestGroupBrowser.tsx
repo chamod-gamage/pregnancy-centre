@@ -59,7 +59,6 @@ const DonorRequestGroupBrowser: FunctionComponent<Props> = (props: React.PropsWi
   });
 
   const filterRequestGroupsOnSearch = (searchString: string) => {
-    const requestGroups = props.requestGroups;
     if (searchString.length > 0){
       const updatedRequestGroups = props.requestGroups.filter(requestGroup => requestGroup?.name?.startsWith(searchString));
       props.setDisplayRequestGroups(updatedRequestGroups);
