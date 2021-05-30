@@ -4,6 +4,7 @@ import React, { FunctionComponent, useState } from "react";
 import { connect } from "react-redux";
 
 import { loadRequestGroups, setDisplayRequestGroups } from '../../data/actions'
+import DonorSearchBar from "../molecules/DonorSearchBar";
 import RequestGroup from '../../data/types/requestGroup'
 import RequestGroupDonorView from './RequestGroupDonorView'
 import RequestGroupList from './RequestGroupList'
@@ -24,6 +25,7 @@ type Props = StateProps & DispatchProps;
 
 const DonorRequestGroupBrowser: FunctionComponent<Props> = (props: React.PropsWithChildren<Props>) => {
   const [selectedRequestGroup, setSelectedRequestGroup] = useState<string | undefined>(props.displayRequestGroups.length <= 0 ? undefined : props.displayRequestGroups[0]._id)
+  const [sortedRequestGroups, setSortedRequestGroups] = useState<Array<RequestGroup> | undefined>(undefined)
 
   const query = gql`
   {
@@ -49,17 +51,30 @@ const DonorRequestGroupBrowser: FunctionComponent<Props> = (props: React.PropsWi
     onCompleted: (data: { requestGroups: Array<RequestGroup> }) => {
       // Clone state.data because sort occurs in-place.
       const displayRequestGroups = sortRequestGroupsAlphabetically(data.requestGroups.map(requestGroup => ({ ...requestGroup })));
-
+      setSortedRequestGroups(displayRequestGroups);
       props.loadRequestGroups(data.requestGroups);
       props.setDisplayRequestGroups(displayRequestGroups);
       setSelectedRequestGroup(displayRequestGroups.length <= 0 ? undefined : displayRequestGroups[0]._id)
     },
   });
 
+  const filterRequestGroupsOnSearch = (searchString: string) => {
+    const requestGroups = props.requestGroups;
+    if (searchString.length > 0){
+      const updatedRequestGroups = props.requestGroups.filter(requestGroup => requestGroup?.name?.startsWith(searchString));
+      props.setDisplayRequestGroups(updatedRequestGroups);
+      if (updatedRequestGroups.length > 0){
+        setSelectedRequestGroup(updatedRequestGroups[0]._id);
+      }
+    } else {
+      props.setDisplayRequestGroups(sortedRequestGroups!);
+    }
+  }
 
   return <div className="donor-request-group-browser">
     <div>
       <h1 className="donor-request-group-browser-header">Current Needs</h1>
+      <DonorSearchBar filterRequestGroups={filterRequestGroupsOnSearch}/>
     </div>
     <div className="donor-request-group-browser-content">
       <div className="donor-request-group-browser-list">
