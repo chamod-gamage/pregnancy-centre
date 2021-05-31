@@ -8,6 +8,7 @@ import DonorSearchBar from "../molecules/DonorSearchBar";
 import RequestGroup from '../../data/types/requestGroup'
 import RequestGroupDonorView from './RequestGroupDonorView'
 import RequestGroupList from './RequestGroupList'
+import RequestType from "../../data/types/requestType";
 import { RootState } from '../../data/reducers'
 
 interface StateProps {
@@ -38,6 +39,10 @@ const DonorRequestGroupBrowser: FunctionComponent<Props> = (props: React.PropsWi
       requirements
       image
       numOpen
+      requestTypes {
+        _id
+        name
+      }
     }
   }`
 
@@ -58,12 +63,25 @@ const DonorRequestGroupBrowser: FunctionComponent<Props> = (props: React.PropsWi
     },
   });
 
-  const filterRequestGroupsOnSearch = (searchString: string) => {
+  const filterRequestTypesOnSearch = (requestTypes: RequestType[] | undefined, searchString: string) => {
+    if (requestTypes){
+      return requestTypes.filter(requestType => requestType.name?.startsWith(searchString)).length > 0
+    }
+    return false;
+  }
+
+  const  filterRequestGroupsOnSearch =  (searchString: string) => {
     if (searchString.length > 0){
-      const updatedRequestGroups = props.requestGroups.filter(requestGroup => requestGroup?.name?.startsWith(searchString));
-      props.setDisplayRequestGroups(updatedRequestGroups);
+      const updatedRequestGroups =  props.requestGroups.filter(requestGroup => {
+        return (
+          requestGroup?.name?.startsWith(searchString) 
+          || filterRequestTypesOnSearch(requestGroup?.requestTypes, searchString)
+        )
+      });
+      const updatedSortedRequestGroups = sortRequestGroupsAlphabetically(updatedRequestGroups);
+      props.setDisplayRequestGroups(updatedSortedRequestGroups);
       if (updatedRequestGroups.length > 0){
-        setSelectedRequestGroup(updatedRequestGroups[0]._id);
+        setSelectedRequestGroup(updatedSortedRequestGroups[0]._id);
       }
     } else {
       props.setDisplayRequestGroups(sortedRequestGroups!);
