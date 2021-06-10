@@ -26,7 +26,8 @@ const filterDeletedRequestEmbeddings = ( requestEmbeddings ) => {
 
 const requestTypeEmbeddingFromRequestType = ( requestType: RequestTypeInterface ) => {
     return {
-        _id: requestType._id
+        _id: requestType._id,
+        name: requestType.name
     }
 }
 
@@ -83,7 +84,8 @@ const requestTypeMutationResolvers = {
                 
                 const requestGroup = await RequestGroup.findById(newRequestType.requestGroup).session(session)
                 requestGroup.requestTypes.push({ 
-                    _id: newRequestType._id
+                    _id: newRequestType._id,
+                    name: newRequestType.name
                 })
                 await requestGroup.save({ session: session })
 

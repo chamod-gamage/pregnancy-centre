@@ -151,6 +151,7 @@ const typeDefs = gql`
         requestGroupsPage(skip: Int, limit: Int): [RequestGroup]
         # --- Left as a proof of concept: --- 
         # requestGroupsFilter(filter: FilterRequestGroupInput, options: FilterOptions): [RequestGroup]
+        requestGroupsFilterByName(filterString: String): [RequestGroup]
     }
 
     type Mutation {

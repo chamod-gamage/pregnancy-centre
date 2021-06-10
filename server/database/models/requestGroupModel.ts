@@ -1,7 +1,8 @@
 import { Document, model, Schema, Types } from 'mongoose'
 
 interface RequestTypeEmbeddingInterface {
-  _id: Types.ObjectId 
+  _id: Types.ObjectId,
+  name: string 
 }
 
 interface RequestGroupInterface extends Document {
@@ -44,7 +45,8 @@ const RequestGroupSchema = new Schema({
   // Embedded Objects
   requestTypes: {
     type: [ { 
-      _id: { type: Types.ObjectId, ref: 'RequestType' } 
+      _id: { type: Types.ObjectId, ref: 'RequestType' },
+      name: String 
     } ],
     default: []
   },
