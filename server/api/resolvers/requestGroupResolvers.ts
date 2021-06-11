@@ -48,7 +48,14 @@ const requestGroupQueryResolvers = {
         return RequestGroup.find().sort({ "name": "ascending", "_id": "ascending" }).skip(skip).limit(limit).exec()
     },
     requestGroupsFilterByName: async (_, { filterString }, ___): Promise<Array<RequestGroupInterface>> => {
-        return RequestGroup.find({ name: new RegExp("^"+ filterString)}).exec()
+        const requestGroups = await RequestGroup.find().exec();
+        const filteredRequestGroups = await requestGroups.filter(requestGroup => {
+            return (
+              requestGroup.name.startsWith(filterString) 
+              || requestGroup.requestTypes.find(requestType => requestType.name?.startsWith(filterString))
+            )
+        });
+        return filteredRequestGroups;
     }
 }
 
